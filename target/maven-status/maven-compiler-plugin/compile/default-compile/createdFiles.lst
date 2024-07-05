@@ -1,0 +1,9 @@
+com\catalogue\places\PlacesApplication.class
+com\catalogue\places\repositories\ProvinceRepository.class
+com\catalogue\places\controllers\ProvinceController.class
+com\catalogue\places\services\ProvinceService.class
+com\catalogue\places\services\CountryService.class
+com\catalogue\places\repositories\CountryRepository.class
+com\catalogue\places\controllers\CountryController.class
+com\catalogue\places\entities\Country.class
+com\catalogue\places\entities\Province.class

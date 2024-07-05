@@ -1,0 +1,38 @@
+version: "3"
+services:
+  placeswmaridb:
+    container_name: "backcontainering22WithMariaDb"
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - serverNetwork
+    depends_on:
+      - database
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://database:3306/bbdd_mariadb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=1234
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  database:
+    image: mariadb:latest
+    container_name: bbdd_mariadb
+    environment:
+      MYSQL_DATABASE: bbdd_mariadb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "3316:3306" # Map container port to host port if you want to access the database directly
+    volumes:
+      - mariadbdata:/var/lib/mysql
+    networks:
+      - serverNetwork
+
+networks:
+  serverNetwork:
+    driver: bridge
+
+volumes:
+  mariadbdata:
