@@ -1,30 +1,69 @@
+# PlacesApplication con MariaDB en Docker
 
-## Ejecucion del proyecto con docker-compose, Dockerfile(app-spring) & Postgres
+Este proyecto configura una aplicación Spring Boot con una base de datos MariaDB utilizando Docker.
 
+## Pasos e Historial de Ejecución
 
-- Crea dos contenedores: database para la base de datos PostgreSQL y backcontainering22 para tu aplicación Spring Boot.
+### Paso 1: Inicializar Contenedor de MariaDB
 
-- PostgreSQL indica que ya contiene una base de datos y no necesita inicialización.
+- **Nombre del Contenedor**: `bbdd_mariadb`
+- **Puerto**: 3306
 
-- PostgreSQL se inicia correctamente y está listo para aceptar conexiones en el puerto 5432.
+**Registro de Ejecución**:
+- Crea sockets de servidor en IP `0.0.0.0` y `::`.
+- El servidor MariaDB está listo para conexiones.
 
-- La aplicación Spring Boot (backcontainering22) se inicia utilizando Java 17.0.2.
+### Paso 2: Inicializar Aplicación Spring Boot
 
-- Se inicializan los repositorios JPA y el servidor web Tomcat en el puerto 8080.
+- **Nombre del Contenedor**: `backcontainering22WithMariaDb`
+- **Puerto**: 8080
 
-- Flyway ejecuta la validación de migraciones y determina que el esquema de la base de datos está actualizado.
+**Registro de Ejecución**:
+- Inicia `PlacesApplication` usando Java 17.
+- Por defecto, usa el perfil "default".
+- Inicializa los repositorios de Spring Data JPA.
+- El pool de conexiones HikariCP se inicia y se conecta a MariaDB.
+- Flyway verifica las migraciones de la base de datos y confirma que el esquema está actualizado.
+- Hibernate procesa la información de la unidad de persistencia.
+- El servidor Tomcat se inicia y escucha en el puerto 8080.
+- La aplicación está completamente operativa.
 
-- Hibernate se inicializa y se advierte que el dialecto de PostgreSQL se selecciona automáticamente, por lo que no es necesario especificarlo explícitamente.
+## Detalles de los Contenedores
 
-- Se advierte que spring.jpa.open-in-view está habilitado por defecto, lo cual puede afectar el rendimiento durante la representación de vistas.
+- **MariaDB**:
+    - **Nombre**: `bbdd_mariadb`
+    - **Puerto**: 3306
+    - **Registros**: Servidor listo para conexiones.
 
-- La aplicación Spring Boot se inicia completamente en el puerto 8080.
+- **Aplicación Spring Boot**:
+    - **Nombre**: `backcontainering22WithMariaDb`
+    - **Puerto**: 8080
+    - **Registros**:
+        - No se ha establecido un perfil activo, por defecto usa "default".
+        - HikariCP inicializado y conectado a MariaDB.
+        - Verificación de migraciones de Flyway, esquema actualizado.
+        - Hibernate inicializado, unidad de persistencia procesada.
+        - Servidor Tomcat iniciado en el puerto 8080.
 
-### Para Ejecutar:
-* Navega a directorio del proyecto
+## Configuración y Advertencias
 
-#### Reconstruir los servicios
-* docker-compose build
+- **Flyway**:
+    - Advertencia: La versión de MariaDB 11.4 es más nueva que la versión probada (11.2).
+    - Acción: Verificar una versión más reciente de Flyway si es necesario.
 
-#### Levantar los servicios y eliminar contenedores ophans (optional)
-* docker-compose up --remove-orphans
+- **Hibernate**:
+    - Advertencia: La propiedad MySQLDialect no es necesaria explícitamente.
+    - Acción: Eliminar la propiedad `hibernate.dialect` de la configuración.
+
+- **Spring JPA**:
+    - Advertencia: `spring.jpa.open-in-view` está habilitado por defecto.
+    - Acción: Configurar `spring.jpa.open-in-view` explícitamente según tus requerimientos.
+
+## Ejecución de la Aplicación
+
+1. **Iniciar MariaDB**:
+   ```sh
+   docker-compose up -d bbdd_mariadb
+
+## Considerar no usar SPRING_JPA_HIBERNATE_DDL_AUTO=update
+## sino usar el none, si se esta usando flyway, esto puede ir en app properties o en compose
